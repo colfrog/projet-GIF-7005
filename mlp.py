@@ -62,10 +62,10 @@ for epoch in range(epochs):
 
     optim.step()
 
-    print(epoch, loss.item())
+    print(f"epoch: {epoch}, perte: {loss.item()}")
 
 # Sauvegarder le réseau entraîné
-torch.save(net.state_dict(), 'heart-attack-mlp.pt2')
+torch.save(net.state_dict(), 'models/heart-attack-mlp.pt2')
 
 # Calculer l'erreur d'entraînement
 output = net(X_train)
@@ -76,6 +76,8 @@ erreur_train = 1 - correct/X_train.shape[0]
 output = net(X_test)
 correct = output.argmax(1).eq(y_test).sum().item()
 erreur_test = 1 - correct/X_test.shape[0]
+
+print(f"Erreur d'entraînement: {erreur_train}, erreur de test: {erreur_test}")
 
 results = pd.DataFrame({'epochs': [epochs], 'perte finale': [loss.item()], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test]})
 results.to_csv('resultats/mlp.csv', index=False)
