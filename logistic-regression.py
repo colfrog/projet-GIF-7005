@@ -1,5 +1,6 @@
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score
 import numpy as np
 import pandas as pd
 
@@ -33,7 +34,9 @@ model = LogisticRegression(C=best_C, solver='newton-cholesky')
 model.fit(X_train, y_train)
 erreur_train = 1 - model.score(X_train, y_train)
 erreur_test = 1 - model.score(X_test, y_test)
+y_pred = model.predict(X_test)
+f1 = f1_score(y_pred, y_test, average='weighted')
 
 # Sauvegarder les résultats
-resultats = pd.DataFrame({'C': [best_C], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test]})
+resultats = pd.DataFrame({'C': [best_C], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test], 'f1 test': [f1]})
 resultats.to_csv('resultats/logistic-regression.csv', index=False)

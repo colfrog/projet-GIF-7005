@@ -1,5 +1,6 @@
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import f1_score
 import numpy as np
 import pandas as pd
 
@@ -33,7 +34,9 @@ model = KNeighborsClassifier(n_neighbors=best_k)
 model.fit(X_train, y_train)
 erreur_train = 1 - model.score(X_train, y_train)
 erreur_test = 1 - model.score(X_test, y_test)
+y_pred = model.predict(X_test)
+f1 = f1_score(y_pred, y_test, average='weighted')
 
 # Sauvegarder les résultats
-resultats = pd.DataFrame({'k': [best_k], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test]})
+resultats = pd.DataFrame({'k': [best_k], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test], 'f1 test': [f1]})
 resultats.to_csv('resultats/knn.csv', index=False)

@@ -2,6 +2,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.mixture import GaussianMixture
 from sklearn.metrics import confusion_matrix
 from scipy.optimize import linear_sum_assignment
+from sklearn.metrics import f1_score
 import numpy as np
 import pandas as pd
 
@@ -43,7 +44,9 @@ model.fit(X_train)
 y_map = get_y_map()
 score_train = 1 - get_accuracy(model, X_train, y_train, y_map)
 score_test = 1 - get_accuracy(model, X_test, y_test, y_map)
+y_pred = model.predict(X_test)
+f1 = f1_score(y_pred, y_map[y_test.astype(int)], average='weighted')
 
 # Sauvegarder les résultats
-resultats = pd.DataFrame({'erreur entraînement': [score_train], 'erreur test': [score_test]})
+resultats = pd.DataFrame({'erreur entraînement': [score_train], 'erreur test': [score_test], 'f1 test': [f1]})
 resultats.to_csv('resultats/gmm.csv', index=False)

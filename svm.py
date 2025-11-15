@@ -1,5 +1,6 @@
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+from sklearn.metrics import f1_score
 import numpy as np
 import scipy as sp
 import pandas as pd
@@ -50,7 +51,9 @@ model = SVC(kernel='rbf', C=best_C, gamma=best_gamma)
 model.fit(X_train, y_train)
 erreur_train = 1 - model.score(X_train, y_train)
 erreur_test = 1 - model.score(X_test, y_test)
+y_pred = model.predict(X_test)
+f1 = f1_score(y_pred, y_test, average='weighted')
 
 # Sauvegarder les résultats
-resultats = pd.DataFrame({'C': [best_C], 'gamma': [best_gamma], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test]})
+resultats = pd.DataFrame({'C': [best_C], 'gamma': [best_gamma], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test], 'f1 test': [f1]})
 resultats.to_csv('resultats/svm.csv', index=False)

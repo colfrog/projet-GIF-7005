@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.optim import SGD
 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 from torch.utils.data import TensorDataset, DataLoader
 
 torch.manual_seed(42)
@@ -89,17 +90,20 @@ def train_and_test(net, name):
 
     # Calculer l'erreur d'entraînement
     output = net(X_train)
-    correct = output.argmax(1).eq(y_train).sum().item()
+    y_pred = output.argmax(1)
+    correct = y_pred.eq(y_train).sum().item()
     erreur_train = 1 - correct/X_train.shape[0]
 
     # Calculer l'erreur en test
     output = net(X_test)
-    correct = output.argmax(1).eq(y_test).sum().item()
+    y_pred = output.argmax(1)
+    correct = y_pred.eq(y_test).sum().item()
     erreur_test = 1 - correct/X_test.shape[0]
+    f1 = f1_score(y_pred.to('cpu').numpy(), y_test.clone().to('cpu').numpy(), average='weighted')
 
     print(f"{name} - Erreur d'entraînement: {erreur_train}, erreur de test: {erreur_test}")
 
-    results = pd.DataFrame({'epochs': [epochs], 'perte finale': [loss.item()], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test]})
+    results = pd.DataFrame({'epochs': [epochs], 'perte finale': [loss.item()], 'erreur entraînement': [erreur_train], 'erreur test': [erreur_test], 'f1 test': [f1]})
     results.to_csv(f'resultats/{name}.csv', index=False)
 
 # Définir le modèle
