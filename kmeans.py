@@ -17,6 +17,8 @@ y = ds[:, -1]
 
 nclasses = 3
 
+# Analyser les prédictions sur l'ensemble du jeu de données pour trouver
+# quelle classe correspond à quelle dans le clustering
 def get_y_map():
     y_map = np.zeros(3, dtype=int)
     y_pred = model.predict(X)
@@ -26,6 +28,7 @@ def get_y_map():
         y_map[c] = col_idx[c]
     return y_map
 
+# Calculer l'exactitude du clustering
 def get_accuracy(model, X, y, y_map):
     y_pred = model.predict(X)
     accuracy = np.mean(y_pred == y_map[y.astype(int)])
