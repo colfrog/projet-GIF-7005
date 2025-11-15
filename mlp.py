@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.optim import SGD
 
 from sklearn.model_selection import train_test_split
+from torch.utils.data import TensorDataset, DataLoader
 
 # Lire le csv et le convertir en pytorch
 ds = pd.read_csv('data/donnees_traitees_classification.csv')
@@ -24,12 +25,12 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Définition du MLP
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self, n):
         super(Net, self).__init__()
-        self.l1 = nn.Linear(X.shape[1], 300) # Couche d'entrée
-        self.l2 = nn.Linear(300, 300) # Couche cachée
-        self.l3 = nn.Linear(300, 300) # Couche cachée
-        self.output = nn.Linear(300, 3) # Couche de sortie
+        self.l1 = nn.Linear(X.shape[1], n) # Couche d'entrée
+        self.l2 = nn.Linear(n, n) # Couche cachée
+        self.l3 = nn.Linear(n, n) # Couche cachée
+        self.output = nn.Linear(n, 3) # Couche de sortie
 
     def forward(self, x):
         x = F.relu(self.l1(x))
@@ -39,7 +40,7 @@ class Net(nn.Module):
         return x
 
 # Définir le modèle
-net = Net()
+net = Net(300)
 
 # Mettre sur la GPU si possible
 net = net.to(device)
@@ -48,19 +49,23 @@ X_test = X_test.to(device)
 y_train = y_train.to(device)
 y_test = y_test.to(device)
 
+train_dataset = TensorDataset(X_train, y_train)
+train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+
 # Entraînement du modèle
 optim = SGD(net.parameters(), lr=0.01)
 criterion = nn.CrossEntropyLoss()
 epochs = 500
 loss = None
 for epoch in range(epochs):
-    optim.zero_grad()
+    for data, targets in train_loader:
+        optim.zero_grad()
 
-    output = net(X_train)
-    loss = criterion(output, y_train)
-    loss.backward()
+        output = net(data)
+        loss = criterion(output, targets)
+        loss.backward()
 
-    optim.step()
+        optim.step()
 
     print(f"epoch: {epoch}, perte: {loss.item()}")
 
